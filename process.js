@@ -3,7 +3,7 @@ process.on('message', function(message) {
     function sendAndClose(err, data) {
         process.send(JSON.stringify({
             data : data,
-            err : err.message || err
+            err : err && err.message ? err.message : err
         }));
         process.exit();
     }

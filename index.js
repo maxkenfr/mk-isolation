@@ -1,13 +1,15 @@
 const { fork } = require('child_process');
 const path = require("path");
 
+const rootDirname = path.dirname(require.main.filename || process.mainModule.filename);
+
 async function isolate(filePath = "", args = []) {
     return new Promise(function (resolve, reject) {
         let messageToSend = {
-            filePath : path.join(__dirname, filePath),
+            filePath : path.join(rootDirname, filePath),
             args
         };
-        const child = fork('./process');
+        const child = fork(path.join(__dirname, './process.js'));
 
         let data = undefined;
         let err = null;
@@ -33,6 +35,3 @@ async function isolate(filePath = "", args = []) {
 }
 
 module.exports = isolate;
-
-
-
