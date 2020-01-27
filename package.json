@@ -1,0 +1,11 @@
+{
+  "name": "mk-isolation",
+  "version": "1.0.1",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "repository": "https://github.com/maxkenfr/mk-isolation.git",
+  "author": "maxbryselbout <max@maxken.fr>",
+  "license": "MIT"
+}
