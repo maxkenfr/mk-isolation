@@ -1,6 +1,7 @@
 const { fork } = require('child_process');
 const path = require("path");
 const {encode, decode} = require("./message");
+const events = require('events');
 
 class Isolation{
     constructor(filePath, options = {}){
@@ -8,6 +9,7 @@ class Isolation{
         this.child = this._createFork();
         this.cycle = options.cycle || 1;
         this.currentCount = 0;
+        events.EventEmitter.call(this);
     }
 
     _createFork(){
@@ -36,10 +38,11 @@ class Isolation{
         if(this._mustReloadProcess()) await this._reloadFork();
         ++this.currentCount;
         return new Promise((resolve, reject)=> {
-            this.child.on('message', function(message) {
+            const messageListener = (message)=> {
                 try {
                     let {action, data} = decode(message);
                     if (action === "data") {
+                        this.child.removeListener('message',messageListener);
                         if (data.err) reject(new Error(data.err));
                         else resolve(data.res);
                     }
@@ -47,7 +50,8 @@ class Isolation{
                 catch (e) {
                     reject(e);
                 }
-            });
+            }
+            this.child.on('message', messageListener);
             this.child.send(encode('data', {
                 filePath : this.filePath,
                 args
