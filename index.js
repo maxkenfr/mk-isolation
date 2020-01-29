@@ -3,10 +3,10 @@ const path = require("path");
 const {encode, decode} = require("./message");
 
 class Isolation{
-    constructor(filePath, options){
+    constructor(filePath, options = {}){
         this.filePath = path.join(path.dirname(module.parent.filename), filePath);
         this.child = this._createFork();
-        this.cycle = 2;
+        this.cycle = options.cycle || 1;
         this.currentCount = 0;
     }
 
@@ -25,8 +25,7 @@ class Isolation{
     }
 
     _mustReloadProcess(){
-        ++this.currentCount;
-        if (this.currentCount > this.cycle){
+        if (this.currentCount >= this.cycle){
             this.currentCount = 0;
             return true;
         }
@@ -35,6 +34,7 @@ class Isolation{
 
     async run(...args){
         if(this._mustReloadProcess()) await this._reloadFork();
+        ++this.currentCount;
         return new Promise((resolve, reject)=> {
             this.child.on('message', function(message) {
                 try {

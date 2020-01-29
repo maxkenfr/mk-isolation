@@ -1,5 +1,5 @@
-async function test(pid, text) {
-    return `${text} ${pid}`;
+async function test(text) {
+    return `${text} ${process.pid}`;
 }
 
 module.exports = test;
